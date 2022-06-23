@@ -1,6 +1,7 @@
 from crypt import methods
 import os
 from sre_parse import CATEGORIES
+from unicodedata import category
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -9,6 +10,15 @@ import random
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
+
+#-------------------------Helper functions--------------------------------------------------------
+def question_categories():
+    categories = Category.query.order_by(Category.id).all()
+    categories_list = []
+    for cat in categories:
+        categories_list.append(cat.type)
+
+    return categories_list
 
 def create_app(test_config=None):
     # create and configure the app
@@ -41,12 +51,9 @@ def create_app(test_config=None):
     """
     @app.route('/categories', methods=['GET'])
     def get_categories():
-        categories = Category.query.order_by(Category.id).all()
-        categories_list = []
-        for cat in categories:
-            categories_list.append(cat.type)
+        
         return jsonify({
-            'categories': categories_list
+            'categories': question_categories()
         })
 
     """
@@ -58,20 +65,19 @@ def create_app(test_config=None):
     """
     @app.route('/questions')
     def get_questions():
+        page = request.args.get('page', 1, type=int)
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
 
+        questions = Question.query.order_by(Question.id).all()
+        formatted_questions = [question.format() for question in questions]
+        print(questions[0].question)
         return jsonify({
             'success': True,
-            'questions': [
-                {
-                    'id' : '1',
-                    'question': 'who won bbn',
-                    'answer': 'don no know',
-                    'difficulty': '1',
-                    'category': '1'
-                }
-            ],
-            'categories': ['science','art'],
-            'total_questions':1,
+            'questions': formatted_questions[start:end],
+            'categories': question_categories(),
+            'total_questions':len(questions),
             'current_category': 1
         })
     """
@@ -137,7 +143,11 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     """
-
+    @app.route('/categories/<int:id>/questions', methods = ['GET'])
+    def get_category_questions(id):
+        return jsonify({
+            'success': True
+        })
     """
     @TODO:
     Create a POST endpoint to get questions to play the quiz.
