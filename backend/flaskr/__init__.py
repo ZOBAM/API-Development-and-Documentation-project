@@ -1,4 +1,6 @@
+from crypt import methods
 import os
+from sre_parse import CATEGORIES
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -13,20 +15,39 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
 
+
     """
     @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     """
+    CORS(app)
 
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
-
+    # CORS Headers
+    @app.after_request
+    def after_request(response):
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
+        )
+        response.headers.add(
+            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
+        )
+        return response
     """
     @TODO:
     Create an endpoint to handle GET requests
     for all available categories.
     """
-
+    @app.route('/categories', methods=['GET'])
+    def get_categories():
+        categories = Category.query.order_by(Category.id).all()
+        categories_list = []
+        for cat in categories:
+            categories_list.append(cat.type)
+        return jsonify({
+            'categories': categories_list
+        })
 
     """
     @TODO:
@@ -34,7 +55,26 @@ def create_app(test_config=None):
     including pagination (every 10 questions).
     This endpoint should return a list of questions,
     number of total questions, current category, categories.
+    """
+    @app.route('/questions')
+    def get_questions():
 
+        return jsonify({
+            'success': True,
+            'questions': [
+                {
+                    'id' : '1',
+                    'question': 'who won bbn',
+                    'answer': 'don no know',
+                    'difficulty': '1',
+                    'category': '1'
+                }
+            ],
+            'categories': ['science','art'],
+            'total_questions':1,
+            'current_category': 1
+        })
+    """
     TEST: At this point, when you start the application
     you should see questions and categories generated,
     ten questions per page and pagination at the bottom of the screen for three pages.
@@ -59,7 +99,25 @@ def create_app(test_config=None):
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.
     """
+    @app.route('/questions', methods=['POST'])
+    def create_new_question():
+        json_data = request.get_json()
+        question = json_data['question']
+        answer = json_data['answer']
+        category = int(json_data['category']) + 1
+        difficulty = json_data['difficulty']
 
+        new_question = Question(
+            question=question,
+            answer=answer,
+            category=category,
+            difficulty=difficulty
+        )
+        new_question.insert()
+
+        return jsonify({
+            'success': True
+        })
     """
     @TODO:
     Create a POST endpoint to get questions based on a search term.
