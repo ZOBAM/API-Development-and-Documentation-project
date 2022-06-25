@@ -73,7 +73,7 @@ You will need to provide detailed documentation of your API endpoints including 
 
 ### Documentation Example
 
-`GET '/api/v1.0/categories'`
+`GET '/categories'`
 
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
@@ -89,6 +89,31 @@ You will need to provide detailed documentation of your API endpoints including 
   "6": "Sports"
 }
 ```
+`GET '/questions'`
+- Fetches a list of dictionary in which each dictionary is corresponding to a row in the questions table.
+- Request Arguments: Page number, sent as url parameter for paginating fetched questions.
+- Returns: A list of dictionaries.
+```json
+[
+  {
+    "id": "1",
+    "question": "Which country has the largest black population in the world?",
+    "answer" "Nigeria",
+    "difficulty": "3",
+    "category": "2"
+  }
+]
+```
+
+`POST '/questions'`
+- Creates a new question.
+- Request Arguments: json payload containing values for question, answer, difficulty and category
+- Returns: json data with success property set to True if creation was successful
+
+`DELETE '/questions/<question_id>'`
+- Deletes a question with the provided id
+- Request Argument: none
+- Returns: json data with success property set to True if deletion was successful
 
 ## Testing
 

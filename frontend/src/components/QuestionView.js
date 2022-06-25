@@ -64,10 +64,12 @@ class QuestionView extends Component {
   }
 
   getByCategory = (id) => {
+    console.log('received id: '+id);
     $.ajax({
-      url: `/categories/${id+1}/questions`, //TODO: update request URL
+      url: `/categories/${Number(id)+1}/questions`, //TODO: update request URL
       type: 'GET',
       success: (result) => {
+        console.log(result);
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
@@ -84,7 +86,7 @@ class QuestionView extends Component {
 
   submitSearch = (searchTerm) => {
     $.ajax({
-      url: `/questions`, //TODO: update request URL
+      url: `/search`, //TODO: update request URL
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
