@@ -34,7 +34,7 @@ class QuestionView extends Component {
         return;
       },
       error: (error) => {
-        alert('Unable to load questions. Please try your request again 1');
+        alert('Unable to load questions. Please try your request again');
         return;
       },
     });
@@ -66,7 +66,7 @@ class QuestionView extends Component {
   getByCategory = (id) => {
     console.log('received id: '+id);
     $.ajax({
-      url: `/categories/${Number(id)+1}/questions`, //TODO: update request URL
+      url: `/categories/${id}/questions`, //TODO: update request URL
       type: 'GET',
       success: (result) => {
         console.log(result);
@@ -120,7 +120,7 @@ class QuestionView extends Component {
             this.getQuestions();
           },
           error: (error) => {
-            alert('Unable to load questions. Please try your request again 1');
+            alert('Unable to load questions. Please try your request again');
             return;
           },
         });
@@ -165,7 +165,7 @@ class QuestionView extends Component {
               key={q.id}
               question={q.question}
               answer={q.answer}
-              category={this.state.categories[q.category-1]}
+              category={this.state.categories[q.category]}
               difficulty={q.difficulty}
               questionAction={this.questionAction(q.id)}
             />

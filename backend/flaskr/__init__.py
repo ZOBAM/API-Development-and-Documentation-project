@@ -15,9 +15,9 @@ QUESTIONS_PER_PAGE = 10
 #-------------------------Helper functions--------------------------------------------------------
 def question_categories():
     categories = Category.query.order_by(Category.id).all()
-    categories_list = []
+    categories_list = {}
     for cat in categories:
-        categories_list.append(cat.type)
+        categories_list[cat.id] = cat.type
 
     return categories_list
 
@@ -132,7 +132,7 @@ def create_app(test_config=None):
         json_data = request.get_json()
         question = json_data['question']
         answer = json_data['answer']
-        category = int(json_data['category']) + 1
+        category = json_data['category']
         difficulty = json_data['difficulty']
 
         try:
@@ -218,12 +218,14 @@ def create_app(test_config=None):
         quiz_category = json_data['quiz_category']
 
         try:
-            question = Question.query.filter_by(category = quiz_category).filter(Question.id.notin_(previous_questions)).first()
+            questions = Question.query.filter_by(category = quiz_category).filter(Question.id.notin_(previous_questions)).all()
+            current_question = questions[random.randrange(0,len(questions))]
             
-            if question is not None:
-                question = question.format()
+            print(current_question.question)
+            if current_question is not None:
+                current_question = current_question.format()
             return jsonify({
-                'question': question
+                'question': current_question
             })
         except:
             abort(404)
