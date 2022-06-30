@@ -113,7 +113,8 @@ def create_app(test_config=None):
             question.delete()
 
             return jsonify({
-                'success': True
+                'success': True,
+                'question_id': question_id
             })
         except:
             abort(422)
@@ -130,12 +131,12 @@ def create_app(test_config=None):
     @app.route('/questions', methods=['POST'])
     def create_new_question():
         json_data = request.get_json()
-        question = json_data['question']
-        answer = json_data['answer']
-        category = json_data['category']
-        difficulty = json_data['difficulty']
 
         try:
+            question = json_data['question']
+            answer = json_data['answer']
+            category = json_data['category']
+            difficulty = json_data['difficulty']
             new_question = Question(
                 question=question,
                 answer=answer,
@@ -219,11 +220,11 @@ def create_app(test_config=None):
 
         try:
             questions = Question.query.filter_by(category = quiz_category).filter(Question.id.notin_(previous_questions)).all()
-            current_question = questions[random.randrange(0,len(questions))]
-            
-            print(current_question.question)
-            if current_question is not None:
+            current_question = None
+            if len(questions):
+                current_question = questions[random.randrange(0,len(questions))]
                 current_question = current_question.format()
+            
             return jsonify({
                 'question': current_question
             })
